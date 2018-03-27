@@ -1,0 +1,6 @@
+model_checkpoint_path: "model_epoch_0047_step_287"
+all_model_checkpoint_paths: "model_epoch_0035_step_215"
+all_model_checkpoint_paths: "model_epoch_0038_step_233"
+all_model_checkpoint_paths: "model_epoch_0041_step_251"
+all_model_checkpoint_paths: "model_epoch_0044_step_269"
+all_model_checkpoint_paths: "model_epoch_0047_step_287"

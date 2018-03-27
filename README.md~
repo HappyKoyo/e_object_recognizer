@@ -1,0 +1,19 @@
+物体認識を用いた処理を行うパッケージ（eは製作者のイニシャルです.）
+
+・ObjectNameToImageRange
+入力は未完成のgpsrプログラムからのトピック/gpsr/graspで、掴みたい物体の名前をString型で受け取る。
+送先はe_point_cloud/ImageRangeToXYZCentroidのトピック/object/image_rangeである。
+
+RealSenseのROSドライバから送られてくる640*480の画像情報から、darknetでボトル、カップ、花瓶状の物体を検出する。
+検出した画像を切り出して、DIGITSのサーバーに送る（重みをダウンロードする方法はうまく行かないためこの方法を用いる）
+サーバーからのリクエストを見て掴みたい物体が存在すれば、ImageRange（top,bottom,left,right）のピクセル番号を送る。
+もし、存在していなければ、/gpsr/grasp_failedで送る。
+
+githubに上げる際、darknetのサイズが大きく上げられなかったため、darknet内で変更したファイルだけを上げた。
+また、darknetの仕様上、以下のようにコマンドを打って実行する。（やろうと思えば、どこからでも実行できるようにできるが、日本大会まで時間がないため、これでとりあえず完成とします。）
+
+$roslaunch realsense realsense_r200_launch.launch 
+$cd $DIGITS_ROOT
+$./digits-devserver
+$roscd e_object_recognizer/darknet
+$rosrun e_object_recognizer ObjectNameToImageRange
