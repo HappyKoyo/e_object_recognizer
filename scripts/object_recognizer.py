@@ -17,12 +17,15 @@ from capsNet import CapsNet
 class EObjectRecognizer:
     def __init__(self):
         self.image_sub = rospy.Subscriber('/camera/rgb/image_raw',Image,self.ImageCB)
-        self.bbox_sub  = rospy.Subscriber('/darknet_ros/bounding_boxes',BoundingBoxes,self.BoundingBoxCB)
-        self.recog_sub = rospy.Subscriber('/object/recog_req',String,self.RecogReqCB)
-        self.grasp_sub = rospy.Subscriber('/object/grasp_req',String,self.GraspReqCB)        
-        self.recog_pub = rospy.Publisher('/object/recog_res',Bool,queue_size=1)
-        self.grasp_pub = rospy.Publisher('/object/grasp_res',Bool,queue_size=1)
+        self.bounding_box_sub  = rospy.Subscriber('/darknet_ros/bounding_boxes',BoundingBoxes,self.BoundingBoxCB)
+        self.recog_req_sub = rospy.Subscriber('/object/recog_req',String,self.RecogReqCB)
+        self.grasp_req_sub = rospy.Subscriber('/object/grasp_req',String,self.GraspReqCB)
+        self.image_generate_req_sub = rospy.Subscriber('/object/image_generate_req',Bool,self.ImageGenerateReqCB)
+
+        self.recog_res_pub   = rospy.Publisher('/object/recog_res',Bool,queue_size=1)
+        self.grasp_res_pub   = rospy.Publisher('/object/grasp_res',Bool,queue_size=1)
         self.image_range_pub = rospy.Publisher('/object/image_range',ImageRange,queue_size=1)
+        self.image_generate_res_pub = rospy.Publisher('/object/image_generate_res',Bool,queue_size=1)
         
         self.OBJ_RECOG_ROOT = '/home/nvidia/catkin_ws/src/e_object_recognizer'
         self.obj_list = ['attack','beads','bikkle','chipstar','cocacola','cupnoodle','jagariko','pringles','redbull','sevenup']
@@ -47,9 +50,9 @@ class EObjectRecognizer:
             image = image.astype(np.float32)/255         #float array
             if target.data == self.obj_list[self.inference(image)]:
                 print "Object exists."                               
-                self.recog_pub.publish(True)
+                self.recog_res_pub.publish(True)
                 return
-        self.recog_pub.publish(False)
+        self.recog_res_pub.publish(False)
         print 'Object does not exist.'
         
     def GraspReqCB(self,target):
@@ -63,6 +66,7 @@ class EObjectRecognizer:
             image = np.asarray(image)                    #python array
             image = image.astype(np.float32)/255         #float array
             if target.data == self.obj_list[self.inference(image)]:
+
                 print "Object exists."                               
                 obj_image_range = ImageRange()
                 obj_image_range.top    = bb[i].ymin
@@ -71,9 +75,28 @@ class EObjectRecognizer:
                 obj_image_range.right  = bb[i].xmax
                 self.image_range_pub.publish(obj_image_range)
                 return
-        self.grasp_pub.publish(False)
+        self.grasp_res_pub.publish(False)
         print 'Object does not exist.'
-        
+
+    def ImageGenerateReqCB(self,req):
+        full_image = self.bridge.imgmsg_to_cv2(self.full_image,"bgr8")
+        drew_bbox_image = full_image
+        full_image = full_image[::-1,:,::-1].copy()
+        bb = self.bbox
+        for i in range(len(bb)):
+            image = full_image[bb[i].ymin:bb[i].ymax,bb[i].xmin:bb[i].xmax]
+            image = PIL.Image.fromarray(image)           #pil
+            image = image.resize((28,28))                #pil 28*28
+            image = np.asarray(image)                    #python array
+            image = image.astype(np.float32)/255         #float array
+            obj_name = self.obj_list[self.inference(image)]
+            font = cv2.FONT_HERSHEY_COMPLEX
+            cv2.rectangle(drew_bbox_image,(bb[i].xmin,bb[i].ymin),(bb[i].xmax,bb[i].ymax),(255,0,255),2)
+            cv2.putText(drew_bbox_image,obj_name,(bb[i].xmin,bb[i].ymin+20),font,1.0,(0,0,0))
+        cv2.imwrite(self.OBJ_RECOG_ROOT+"/images/object_detection_result.png",drew_bbox_image)
+        self.image_generate_res_pub.publish(True)
+        print 'image generated!'
+                
     def inference(self,image):
         print "Loading Network.."
         pred_result = []

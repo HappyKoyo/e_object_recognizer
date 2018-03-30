@@ -19,5 +19,10 @@ realsense_camera、darknet_rosは別パッケージ
 出力2 /object/image_range e_object_recognizer/ImageRange  
 指定したオブジェクトを検出できたどうかを出力1で返し、検出した領域を出力2で返す。  
 
+3.物体検出結果画像生成  
+入力 /object/image_generate_req std_msgs/Bool  
+出力 /object/image_generate_res std_msgs/Bool
+部一体検出結果画像を/images/object_detection_result.pngに保存した後、Trueを返す。  
+
 # その他
 weightの一部ファイルが大きくて上がらなかったので、足りない分は研究室まで取りに来るようにお願いします。
