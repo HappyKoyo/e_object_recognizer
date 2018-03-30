@@ -2,9 +2,9 @@
 YOLOで物体検出を行い、それをカプセルネットワークで分類するパッケージです。
 
 # 実行方法
-$ roslaunch realsense_camera r200_nodelet_rgbd.launch  
-$ roslaunch darknet_ros darknet_ros_gdb.launch  
-$ rosrun e_object_recognizer object_recognizer  
+    $ roslaunch realsense_camera r200_nodelet_rgbd.launch  
+    $ roslaunch darknet_ros darknet_ros_gdb.launch  
+    $ rosrun e_object_recognizer object_recognizer  
 realsense_camera、darknet_rosは別パッケージ  
 
 # 入出力
