@@ -21,8 +21,8 @@ realsense_camera、darknet_rosは別パッケージ
 
 3.物体検出結果画像生成  
 入力 /object/image_generate_req std_msgs/Bool  
-出力 /object/image_generate_res std_msgs/Bool
-部一体検出結果画像を/images/object_detection_result.pngに保存した後、Trueを返す。  
+出力 /object/image_generate_res std_msgs/Bool  
+物体検出結果画像を/images/object_detection_result.pngに保存した後、Trueを返す。  
 
 # その他
 weightの一部ファイルが大きくて上がらなかったので、足りない分は研究室まで取りに来るようにお願いします。
