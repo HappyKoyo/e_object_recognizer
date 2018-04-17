@@ -21,12 +21,14 @@ class EObjectRecognizer:
         self.recog_req_sub = rospy.Subscriber('/object/recog_req',String,self.RecogReqCB)
         self.grasp_req_sub = rospy.Subscriber('/object/grasp_req',String,self.GraspReqCB)
         self.image_generate_req_sub = rospy.Subscriber('/object/image_generate_req',Bool,self.ImageGenerateReqCB)
+        self.count_req_sub = rospy.Subscriber('/object/count_req',Bool,self.CountReqCB)
 
         self.recog_res_pub   = rospy.Publisher('/object/recog_res',Bool,queue_size=1)
         self.grasp_res_pub   = rospy.Publisher('/object/grasp_res',Bool,queue_size=1)
         self.image_range_pub = rospy.Publisher('/object/image_range',ImageRange,queue_size=1)
         self.image_generate_res_pub = rospy.Publisher('/object/image_generate_res',Bool,queue_size=1)
-        
+        self.count_res_pub   = rospy.Publisher('/object/count_res',Int8,queue_size=1)
+
         self.OBJ_RECOG_ROOT = '/home/nvidia/catkin_ws/src/e_object_recognizer'
         self.obj_list = ['attack','beads','bikkle','chipstar','cocacola','cupnoodle','jagariko','pringles','redbull','sevenup']
         self.bridge = CvBridge()
@@ -101,6 +103,9 @@ class EObjectRecognizer:
         self.image_generate_res_pub.publish(True)
         print 'image generated!'
                 
+    def CountReqCB(self,req):
+        self.count_res_pub.publish(len(self.bbox))
+
     def inference(self,image):
         print "Loading Network.."
         pred_result = []

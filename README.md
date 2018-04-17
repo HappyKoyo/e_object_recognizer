@@ -24,5 +24,10 @@ realsense_camera、darknet_rosは別パッケージ
 出力 /object/image_generate_res std_msgs/Bool  
 物体検出結果画像を/images/object_detection_result.pngに保存した後、Trueを返す。  
 
+4.物体数カウント
+入力  /object/count_req std_msgs/Bool
+出力  /object/count_res std_msgs/Int8
+視野内の物体の数を返す。
+
 # その他
 weightの一部ファイルが大きくて上がらなかったので、足りない分は研究室まで取りに来るようにお願いします。
