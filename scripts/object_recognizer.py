@@ -31,6 +31,7 @@ class EObjectRecognizer:
         self.obj_list = ['attack','beads','bikkle','chipstar','cocacola','cupnoodle','jagariko','pringles','redbull','sevenup']
         self.bridge = CvBridge()
         self.bbox = 'none'
+        self.target = 'none'
 
     def ImageCB(self,img):
         self.full_image = img
@@ -39,6 +40,7 @@ class EObjectRecognizer:
         self.bbox = bb.boundingBoxes
 
     def RecogReqCB(self,target):
+        self.target = target.data
         full_image = self.bridge.imgmsg_to_cv2(self.full_image,"bgr8")
         full_image = full_image[::-1,:,::-1].copy()
         bb = self.bbox
@@ -48,7 +50,7 @@ class EObjectRecognizer:
             image = image.resize((28,28))                #pil 28*28
             image = np.asarray(image)                    #python array
             image = image.astype(np.float32)/255         #float array
-            if target.data == self.obj_list[self.inference(image)]:
+            if bb[i].Class != "apple":
                 print "Object exists."                               
                 self.recog_res_pub.publish(True)
                 return
@@ -56,6 +58,8 @@ class EObjectRecognizer:
         print 'Object does not exist.'
         
     def GraspReqCB(self,target):
+        if target.data != "retry":
+            self.target = target.data
         full_image = self.bridge.imgmsg_to_cv2(self.full_image,"bgr8")
         full_image = full_image[::-1,:,::-1].copy()
         bb = self.bbox
@@ -65,8 +69,8 @@ class EObjectRecognizer:
             image = image.resize((28,28))                #pil 28*28
             image = np.asarray(image)                    #python array
             image = image.astype(np.float32)/255         #float array
-            if target.data == self.obj_list[self.inference(image)]:
-
+            #if self.target == self.obj_list[self.inference(image)]:
+            if bb[i].Class != "apple":            
                 print "Object exists."                               
                 obj_image_range = ImageRange()
                 obj_image_range.top    = bb[i].ymin
